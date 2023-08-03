@@ -20,7 +20,7 @@ environment {
         }
         steps{
         withSonarQubeEnv('sonarqube-server'){
-            sh "${scannerHome}/bin/sonar-scanner"
+            bash "${scannerHome}/bin/sonar-scanner"
         }
     
         }
