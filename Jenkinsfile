@@ -10,18 +10,26 @@ environment {
     stages {
         stage("build"){
             steps{
-                sh 'mvn clean deploy'
+                echo "------------------------- Build Started -----------------------"
+                sh 'mvn clean deploy -Dmaven.test.skip=true'
+                echo "------------------------- Build Completed ----------------------"
             }
         }
-    
+        stage("Test"){
+            steps{
+                echo "------------------------- Test Started -----------------------"
+                sh 'mvn surefire-report:report'
+                echo "------------------------- Test Completed ----------------------"
+            }
+        }
         stage('SonarQube analysis') {
         environment {
          scannerHome = tool 'sonar-scanner'
         }
-        steps{
-        withSonarQubeEnv('sonarqube-server'){
-            sh "${scannerHome}/bin/sonar-scanner"
-        }
+            steps{
+                withSonarQubeEnv('sonarqube-server'){
+                    sh "${scannerHome}/bin/sonar-scanner"
+            }
     
         }
         }
