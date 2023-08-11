@@ -1,5 +1,7 @@
 
 def registry = 'https://dev05.jfrog.io'
+def imageName = 'dev05.jfrog.io/dev05-docker-local/ttrend'
+def version   = '2.1.4'
 pipeline {
     agent {
         node {
@@ -7,7 +9,7 @@ pipeline {
         }
     }
 environment {
-    PATH = "/opt/apache-maven-3.9.3/bin:$PATH"
+    PATH = "/opt/apache-maven-3.9.4/bin:$PATH"
 }
     stages {
         stage("build"){
@@ -72,6 +74,27 @@ environment {
             
                 }
             }   
+        }
+        stage(" Docker Build ") {
+            steps {
+                script {
+                    echo '<--------------- Docker Build Started --------------->'
+                    app = docker.build(imageName+":"+version)
+                    echo '<--------------- Docker Build Ends --------------->'
+                }
+            }
+        }
+
+        stage (" Docker Publish "){
+            steps {
+                script {
+                    echo '<--------------- Docker Publish Started --------------->'  
+                    docker.withRegistry(registry, 'artfiact-cred'){
+                    app.push()
+                    }    
+                    echo '<--------------- Docker Publish Ended --------------->'  
+                }
+            }
         }
     }
 }
